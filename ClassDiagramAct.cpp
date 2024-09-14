@@ -5,6 +5,16 @@
 #include <thread>
 using namespace std;
 
+int cartPrice[3];
+
+
+// Struct to hold product details
+struct ProductDetails {
+    string productID;
+    int price;
+    int quantity;
+};
+
 class Shopping
 {
 public:
@@ -20,7 +30,7 @@ public:
         cout << "\nProduct ID" << setw(15) << "Name" << setw(15) << "Price" << setw(15) << "Qty" << endl;
         for (int i = 0; i < 3; i++) {
             if (qty[i] > 0) {
-                cout << "  " << productID[i] << setw(15) << productName[i] << setw(15) << (total / qty[i]) << setw(15) << qty[i] << endl; 
+                cout << "  " << productID[i] << setw(17) << productName[i] << setw(15) << (cartPrice[i]*qty[i]) << setw(15) << qty[i] << endl; 
             }
         }
     }
@@ -31,9 +41,9 @@ public:
     static int orderCount;
     int orderID;
     int totalAmount;
-    vector<pair<string, pair<int, int>>> orderDetails;  // To store Product ID, Price, and Quantity
+    vector<ProductDetails> orderDetails;  // To store product details (ID, Price, Quantity)
 
-    Order(int total, vector<pair<string, pair<int, int>>> details)
+    Order(int total, vector<ProductDetails> details)
     {
         orderID = ++orderCount;
         totalAmount = total;
@@ -43,8 +53,8 @@ public:
     void displayOrder() {
         cout << "Order ID: " << orderID << "\nTotal Amount: " << totalAmount << "\nOrder Details:\n";
         cout << "Product ID" << setw(15) << "Price" << setw(15) << "Qty" << endl;
-        for (auto& detail : orderDetails) {
-            cout << "  " << detail.first << setw(15) << detail.second.first << setw(15) << detail.second.second << endl;
+        for (const auto& detail : orderDetails) {
+            cout << "  " << detail.productID << setw(15) << detail.price << setw(15) << detail.quantity << endl;
         }
         cout << endl;
     }
@@ -72,7 +82,7 @@ public:
             << "2 - View Shopping Cart" << endl
             << "3 - View Orders" << endl
             << "4 - Exit" << endl;
-    };
+    }
 
     void addProduct()
     {
@@ -98,6 +108,7 @@ public:
                 cart.productID[0] = productID[0];
                 cart.qty[0] += qty[0];
                 cart.total += price[0] * qty[0];
+                cartPrice[0]=price[0];
 
                 cout << "\nProduct added successfully!" << endl;
                 break;
@@ -128,6 +139,8 @@ public:
                 cart.productID[2] = productID[2];
                 cart.qty[2] += qty[2];
                 cart.total += price[2] * qty[2];
+                cartPrice[0]=price[0];
+                
 
                 cout << "\nProduct added successfully!" << endl;
                 break;
@@ -137,7 +150,7 @@ public:
                 cout << "\nPlease enter a valid product ID from the list." << endl;
                 continue;
             }
-        };
+        }
     }
 };
 
@@ -218,10 +231,10 @@ int main()
             {
                 if (cart.total > 0) {
                     // Create an order and add to order list
-                    vector<pair<string, pair<int, int>>> orderDetails;
+                    vector<ProductDetails> orderDetails;
                     for (int i = 0; i < 3; i++) {
                         if (cart.qty[i] > 0) {
-                            orderDetails.push_back(make_pair(cart.productID[i], make_pair((cart.total / cart.qty[i]), cart.qty[i])));  // Correct price and qty
+                            orderDetails.push_back({cart.productID[i], (cart.total / cart.qty[i]), cart.qty[i]});
                         }
                     }
                     orders.push_back(Order(cart.total, orderDetails));
